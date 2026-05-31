@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\FavoriteController;
+use App\Http\Controllers\Api\V1\BookingController;
 
 
 Route::prefix('v1')->group(function () {
@@ -50,5 +51,9 @@ Route::prefix('v1')->group(function () {
         // Favorites
         Route::get('/favorites', [FavoriteController::class, 'index']);
         Route::post('/favorites/toggle', [FavoriteController::class, 'toggle']);
+
+        // Bookings
+        Route::post('/bookings', [BookingController::class, 'store']);
+        Route::get('/bookings', [BookingController::class, 'index']);
     });
 });

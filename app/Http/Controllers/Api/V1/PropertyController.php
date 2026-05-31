@@ -68,9 +68,9 @@ class PropertyController extends Controller
             ->properties()
             ->with(['district', 'county', 'subCounty', 'parish', 'village', 'media', 'categories'])
             ->withCount('units')
-            ->withExists(['favoriteProperties' => function ($subQ) use ($user) {
-                $subQ->where('user_id', $user->id);
-            }])
+            // ->withExists(['favoriteProperties' => function ($subQ) use ($user) {
+            //     $subQ->where('user_id', $user->id);
+            // }])
             ->latest()
             ->paginate(15);
 
