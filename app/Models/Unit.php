@@ -15,7 +15,8 @@ class Unit extends Model
         'bedrooms',
         'bathrooms',
         'size_sqm',
-        'is_available',
+        'status',
+        'stay_type',
         'currency'
     ];
 

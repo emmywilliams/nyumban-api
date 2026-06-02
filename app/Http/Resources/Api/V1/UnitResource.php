@@ -23,7 +23,8 @@ class UnitResource extends JsonResource
             'bedrooms' => (int) $this->bedrooms,
             'bathrooms' => (int) $this->bathrooms,
             'size_sqm' => $this->size_sqm ? (int) $this->size_sqm : null,
-            'status' => $this->is_available ? 'available' : 'occupied',
+            'status' => $this->status ?? 'available',
+            'stay_type' => $this->stay_type ?? 'long_term',
 
             // 1. The Main Type (Studio, Bedsitter, etc.)
             'type' => $this->categories->where('type', 'unit_type')->first()?->name ?? 'Apartment',

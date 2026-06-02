@@ -7,6 +7,7 @@ use App\Models\Property;
 use App\Http\Resources\Api\V1\PropertyResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PropertyController extends Controller
 {
@@ -18,6 +19,7 @@ class PropertyController extends Controller
         $query = Property::query()
             ->with(['district', 'county', 'subCounty', 'parish', 'village', 'media', 'categories'])
             ->withCount('units');
+
 
         $query->where('status', 'active');
 
@@ -68,9 +70,7 @@ class PropertyController extends Controller
             ->properties()
             ->with(['district', 'county', 'subCounty', 'parish', 'village', 'media', 'categories'])
             ->withCount('units')
-            // ->withExists(['favoriteProperties' => function ($subQ) use ($user) {
-            //     $subQ->where('user_id', $user->id);
-            // }])
+
             ->latest()
             ->paginate(15);
 
@@ -99,6 +99,42 @@ class PropertyController extends Controller
             'landlord:id,name,phone,avatar',
             'units.categories'
         ]);
+        $startDate = null;
+        $endDate = null;
+
+        $rawStart = $request->query('start_date');
+        $rawEnd = $request->query('end_date');
+
+        $units = $property->units()->with('categories')->get();
+
+        if ($rawStart && $rawEnd) {
+            try {
+                $startDate = \Carbon\Carbon::parse($rawStart)->toDateString();
+                $endDate = \Carbon\Carbon::parse($rawEnd)->toDateString();
+
+                $units->each(function ($unit) use ($startDate, $endDate) {
+                    if ($unit->status === 'occupied') {
+                        return;
+                    }
+
+                    // Check for overlapping active schedules
+                    $hasOverlap = $unit->bookings()
+                        ->whereIn('status', ['pending', 'confirmed', 'in_progress'])
+                        ->where('start_date', '<', $endDate)
+                        ->where('end_date', '>', $startDate)
+                        ->exists();
+
+                    if ($hasOverlap) {
+                        $unit->status = 'occupied';
+                    }
+                });
+            } catch (\Exception $e) {
+                Log::error("Date parsing mismatch context: " . $e->getMessage());
+            }
+        }
+
+        // Set the modified collection back onto the property model instance
+        $property->setRelation('units', $units);
 
         // 🟢 Inject into individual resource model instances on detail lookups
         $property->is_favorite = $user ? $user->favoriteProperties()->where('properties.id', $property->id)->exists() : false;

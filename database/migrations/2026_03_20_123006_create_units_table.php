@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AvailabilitySlot;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +21,8 @@ return new class extends Migration
             $table->unsignedTinyInteger('bedrooms')->nullable();
             $table->unsignedTinyInteger('bathrooms')->nullable();
             $table->integer('size_sqm')->nullable();
-            $table->boolean('is_available')->default(true);
+            $table->string('status')->default('available');
+            $table->enum('stay_type', ['short_term', 'long_term'])->default('long_term');
             $table->timestamps();
         });
     }

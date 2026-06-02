@@ -56,7 +56,8 @@ class UnitController extends Controller
             'bedrooms'         => 'required|integer|min:0',
             'bathrooms'        => 'required|integer|min:0',
             'size_sqm'         => 'nullable|integer',
-            'is_available'     => 'boolean',
+            'status' => 'sometimes|string|in:available,pending_approval,occupied',
+            'stay_type'        => 'required|string|in:short_term,long_term',
         ]);
 
         // 3. Create the Unit
@@ -93,7 +94,8 @@ class UnitController extends Controller
             'bedrooms'     => 'sometimes|integer|min:0',
             'bathrooms'    => 'sometimes|integer|min:0',
             'size_sqm'     => 'sometimes|nullable|integer',
-            'is_available' => 'sometimes|boolean',
+            'status' => 'sometimes|string|in:available,pending_approval,occupied',
+            'stay_type' => 'sometimes|string|in:short_term,long_term',
         ]);
 
         // 3. Perform Update
